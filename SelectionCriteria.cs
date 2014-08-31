@@ -419,7 +419,7 @@ namespace JeffDege.SelectionCriteria
 			return this.constructSinglePredicate<T>();
 		}
 
-		public Expression<Func<T, bool>> constructAggregatePredicate<T>()
+		private Expression<Func<T, bool>> constructAggregatePredicate<T>()
 		{
 			var predicate = this.isAnd ? PredicateBuilder.True<T>() : PredicateBuilder.False<T>();
 
@@ -444,7 +444,7 @@ namespace JeffDege.SelectionCriteria
 			return Expression.Lambda<Func<T, bool>>(body, candidateExpr);
 		}
 
-		public Expression<Func<T, bool>> constructMethodCallPredicate<T>()
+		private Expression<Func<T, bool>> constructMethodCallPredicate<T>()
 		{
 			var type = typeof(T);
 
@@ -481,7 +481,7 @@ namespace JeffDege.SelectionCriteria
 			}
 		}
 
-		public Expression<Func<T, bool>> constructStaticCallPredicate<T>()
+		private Expression<Func<T, bool>> constructStaticCallPredicate<T>()
 		{
 			var type = typeof(T);
 
@@ -533,7 +533,7 @@ namespace JeffDege.SelectionCriteria
 			throw new InvalidExpressionException(String.Format("Invalid SelectionComparison {0}", selectionComparison));
 		}
 
-		public Expression<Func<T, bool>> constructAnyPredicate<T>()
+		private Expression<Func<T, bool>> constructAnyPredicate<T>()
 		{
 			var type = typeof(T);
 
@@ -559,7 +559,7 @@ namespace JeffDege.SelectionCriteria
 			return lambda;
 		}
 
-		public Expression<Func<T, bool>> constructSinglePredicate<T>()
+		private Expression<Func<T, bool>> constructSinglePredicate<T>()
 		{
 			var type = typeof(T);
 
