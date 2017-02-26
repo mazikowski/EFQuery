@@ -1,7 +1,7 @@
-SelectionCriteria
+EFQuery
 
 =================
 
 
 
-A serializable SelectionCriteria class, built on Pete Montgomery's PredicateBuilder
+A serializable EFQuery class, built on Pete Montgomery's PredicateBuilder

@@ -9,15 +9,15 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PeteMontgomery.PredicateBuilder;
 
-namespace JeffDege.SelectionCriteria
+namespace JeffDege.EFQuery
 {
-	public class SelectionCriteria
+	public class EFQuery
 	{
 		#region static convenience functions
 
-		public static SelectionCriteria compare(SelectionComparison comparison, string fieldName, object fieldValue)
+		public static EFQuery compare(SelectionComparison comparison, string fieldName, object fieldValue)
 		{
-			return new SelectionCriteria
+			return new EFQuery
 			{
 				selectionComparison = comparison,
 				fieldName = fieldName,
@@ -26,67 +26,67 @@ namespace JeffDege.SelectionCriteria
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is always true
+		/// returns a EFQuery that is always true
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria isTrue()
+		/// <returns>EFQuery</returns>
+		public static EFQuery isTrue()
 		{
-			return new SelectionCriteria { selectionComparison = SelectionComparison.IsTrue };
+			return new EFQuery { selectionComparison = SelectionComparison.IsTrue };
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is always false
+		/// returns a EFQuery that is always false
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria isFalse()
+		/// <returns>EFQuery</returns>
+		public static EFQuery isFalse()
 		{
-			return new SelectionCriteria { selectionComparison = SelectionComparison.IsFalse };
+			return new EFQuery { selectionComparison = SelectionComparison.IsFalse };
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName contains fieldValue as a substring
+		/// returns a EFQuery that is true if fieldName contains fieldValue as a substring
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria contains(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery contains(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.Contains, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName starts with fieldValue as a substring
+		/// returns a EFQuery that is true if fieldName starts with fieldValue as a substring
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria startsWith(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery startsWith(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.StartsWith, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName ends with fieldValue as a substring
+		/// returns a EFQuery that is true if fieldName ends with fieldValue as a substring
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria endsWith(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery endsWith(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.EndsWith, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName matches fieldValue as a SQL LIKE pattern
+		/// returns a EFQuery that is true if fieldName matches fieldValue as a SQL LIKE pattern
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria like(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery like(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.Like, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if the innerCriteria evaluates true
+		/// returns a EFQuery that is true if the innerCriteria evaluates true
 		/// on the fieldName. (Assumes fieldName is a one-to-many navigational property).
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria any(string fieldName, SelectionCriteria innerCriteria)
+		/// <returns>EFQuery</returns>
+		public static EFQuery any(string fieldName, EFQuery innerCriteria)
 		{
-			return new SelectionCriteria
+			return new EFQuery
 			{
 				selectionComparison = SelectionComparison.Any,
 				fieldName = fieldName,
@@ -95,135 +95,135 @@ namespace JeffDege.SelectionCriteria
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is equal to fieldValue
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria equal(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery equal(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.Equal, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is not equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is not equal to fieldValue
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria notEqual(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery notEqual(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.NotEqual, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is greater than fieldValue
+		/// returns a EFQuery that is true if fieldName is greater than fieldValue
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria greaterThan(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery greaterThan(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.GreaterThan, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is greater than or equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is greater than or equal to fieldValue
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria greaterThanOrEqual(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery greaterThanOrEqual(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.GreaterThanOrEqual, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is less than fieldValue
+		/// returns a EFQuery that is true if fieldName is less than fieldValue
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria lessThan(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery lessThan(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.LessThan, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is less than or equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is less than or equal to fieldValue
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria lessThanOrEqual(string fieldName, object fieldValue)
+		/// <returns>EFQuery</returns>
+		public static EFQuery lessThanOrEqual(string fieldName, object fieldValue)
 		{
 			return compare(SelectionComparison.LessThanOrEqual, fieldName, fieldValue);
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if all of the selectionCriteriae evaluate true
+		/// returns a EFQuery that is true if all of the efQueries evaluate true
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria and(IEnumerable<SelectionCriteria> selectionCriteriae)
+		/// <returns>EFQuery</returns>
+		public static EFQuery and(IEnumerable<EFQuery> efQueries)
 		{
-			return new SelectionCriteria
+			return new EFQuery
 			{
 				selectionComparison = SelectionComparison.And,
-				aggregateList = selectionCriteriae
+				aggregateList = efQueries
 			};
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if at least one of the selectionCriteriae evaluates true
+		/// returns a EFQuery that is true if at least one of the efQueries evaluates true
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria or(IEnumerable<SelectionCriteria> selectionCriteriae)
+		/// <returns>EFQuery</returns>
+		public static EFQuery or(IEnumerable<EFQuery> efQueries)
 		{
-			return new SelectionCriteria
+			return new EFQuery
 			{
 				selectionComparison = SelectionComparison.Or,
-				aggregateList = selectionCriteriae
+				aggregateList = efQueries
 			};
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if at least one the selectionCriteriae evaluates false
+		/// returns a EFQuery that is true if at least one the efQueries evaluates false
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria nand(IEnumerable<SelectionCriteria> selectionCriteriae)
+		/// <returns>EFQuery</returns>
+		public static EFQuery nand(IEnumerable<EFQuery> efQueries)
 		{
-			return new SelectionCriteria
+			return new EFQuery
 			{
 				selectionComparison = SelectionComparison.Nand,
-				aggregateList = selectionCriteriae
+				aggregateList = efQueries
 			};
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if all of the selectionCriteriae evaluate false
+		/// returns a EFQuery that is true if all of the efQueries evaluate false
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria nor(IEnumerable<SelectionCriteria> selectionCriteriae)
+		/// <returns>EFQuery</returns>
+		public static EFQuery nor(IEnumerable<EFQuery> efQueries)
 		{
-			return new SelectionCriteria
+			return new EFQuery
 			{
 				selectionComparison = SelectionComparison.Nor,
-				aggregateList = selectionCriteriae
+				aggregateList = efQueries
 			};
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if all of the selectionCriteria evaluates false
+		/// returns a EFQuery that is true if all of the EFQuery evaluates false
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria not(SelectionCriteria selectionCriteria)
+		/// <returns>EFQuery</returns>
+		public static EFQuery not(EFQuery efQuery)
 		{
-			return nand(new[] { selectionCriteria });
+			return nand(new[] { efQuery });
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is equal to one of the objects
+		/// returns a EFQuery that is true if fieldName is equal to one of the objects
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria containedIn(string fieldName, IEnumerable<object> objects)
+		/// <returns>EFQuery</returns>
+		public static EFQuery containedIn(string fieldName, IEnumerable<object> objects)
 		{
 			return or(objects.Select(o => equal(fieldName, o)));
 		}
 
 		/// <summary>
-		/// returns a SelectionCriteria that is true if fieldName is greatder than or equal to left
+		/// returns a EFQuery that is true if fieldName is greatder than or equal to left
 		/// and less than or equal to right
 		/// </summary>
-		/// <returns>SelectionCriteria</returns>
-		public static SelectionCriteria between(string fieldName, object left, object right)
+		/// <returns>EFQuery</returns>
+		public static EFQuery between(string fieldName, object left, object right)
 		{
 			return and(new[]
 			{
@@ -246,13 +246,13 @@ namespace JeffDege.SelectionCriteria
 		public object fieldValue { get; set; }
 
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-		public SelectionCriteria innerCriteria { get; set; }
+		public EFQuery innerCriteria { get; set; }
 
-		private IEnumerable<SelectionCriteria> aggregateList_ = null;
+		private IEnumerable<EFQuery> aggregateList_ = null;
 
-		public IEnumerable<SelectionCriteria> aggregateList
+		public IEnumerable<EFQuery> aggregateList
 		{
-			get { return this.aggregateList_ ?? (this.aggregateList_ = new List<SelectionCriteria>()); }
+			get { return this.aggregateList_ ?? (this.aggregateList_ = new List<EFQuery>()); }
 			set { this.aggregateList_ = value; }
 		}
 
@@ -260,13 +260,13 @@ namespace JeffDege.SelectionCriteria
 
 		#region Constructors
 
-		public SelectionCriteria()
+		public EFQuery()
 		{
 			// We default to Equal because that's our most common pattern:
 			this.selectionComparison = SelectionComparison.Equal;
 		}
 
-		public SelectionCriteria(SelectionComparison selectionComparison, string fieldName, object fieldValue)
+		public EFQuery(SelectionComparison selectionComparison, string fieldName, object fieldValue)
 		{
 			this.selectionComparison = selectionComparison;
 			this.fieldName = fieldName;
@@ -547,7 +547,7 @@ namespace JeffDege.SelectionCriteria
 			var collectionType = member.Type;
 			var memberType = collectionType.GenericTypeArguments[0];
 
-			var constructPredicateMethod = typeof(SelectionCriteria).GetMethod("constructPredicate");
+			var constructPredicateMethod = typeof(EFQuery).GetMethod("constructPredicate");
 			var constructPredicateMethodGeneric = constructPredicateMethod.MakeGenericMethod(memberType);
 			var innerPredicate = (Expression)constructPredicateMethodGeneric.Invoke(this.innerCriteria, null);
 
