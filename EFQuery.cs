@@ -5,6 +5,8 @@ using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PeteMontgomery.PredicateBuilder;
@@ -13,16 +15,16 @@ namespace JeffDege.EFQuery
 {
 	public class EFQuery
 	{
-		#region static convenience functions
+#region static convenience functions
 
-		public static EFQuery compare(SelectionComparison comparison, string fieldName, object fieldValue)
+		public static EFQuery compare(SelectionComparison comparison, string fieldName, object rightHandSide)
 		{
 			return new EFQuery
-			{
-				selectionComparison = comparison,
-				fieldName = fieldName,
-				fieldValue = fieldValue
-			};
+				{
+					selectionComparison = comparison,
+					fieldName = fieldName,
+					rightHandSide = rightHandSide as EFQuery ?? EFQuery.constant(rightHandSide)
+				};
 		}
 
 		/// <summary>
@@ -44,39 +46,39 @@ namespace JeffDege.EFQuery
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName contains fieldValue as a substring
+		/// returns a EFQuery that is true if fieldName contains rightHandSide as a substring
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery contains(string fieldName, object fieldValue)
+		public static EFQuery contains(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.Contains, fieldName, fieldValue);
+			return compare(SelectionComparison.Contains, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName starts with fieldValue as a substring
+		/// returns a EFQuery that is true if fieldName starts with rightHandSide as a substring
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery startsWith(string fieldName, object fieldValue)
+		public static EFQuery startsWith(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.StartsWith, fieldName, fieldValue);
+			return compare(SelectionComparison.StartsWith, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName ends with fieldValue as a substring
+		/// returns a EFQuery that is true if fieldName ends with rightHandSide as a substring
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery endsWith(string fieldName, object fieldValue)
+		public static EFQuery endsWith(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.EndsWith, fieldName, fieldValue);
+			return compare(SelectionComparison.EndsWith, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName matches fieldValue as a SQL LIKE pattern
+		/// returns a EFQuery that is true if fieldName matches rightHandSide as a SQL LIKE pattern
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery like(string fieldName, object fieldValue)
+		public static EFQuery like(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.Like, fieldName, fieldValue);
+			return compare(SelectionComparison.Like, fieldName, rightHandSide);
 		}
 
 		/// <summary>
@@ -95,57 +97,57 @@ namespace JeffDege.EFQuery
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName is equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is equal to rightHandSide
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery equal(string fieldName, object fieldValue)
+		public static EFQuery equal(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.Equal, fieldName, fieldValue);
+			return compare(SelectionComparison.Equal, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName is not equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is not equal to rightHandSide
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery notEqual(string fieldName, object fieldValue)
+		public static EFQuery notEqual(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.NotEqual, fieldName, fieldValue);
+			return compare(SelectionComparison.NotEqual, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName is greater than fieldValue
+		/// returns a EFQuery that is true if fieldName is greater than rightHandSide
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery greaterThan(string fieldName, object fieldValue)
+		public static EFQuery greaterThan(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.GreaterThan, fieldName, fieldValue);
+			return compare(SelectionComparison.GreaterThan, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName is greater than or equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is greater than or equal to rightHandSide
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery greaterThanOrEqual(string fieldName, object fieldValue)
+		public static EFQuery greaterThanOrEqual(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.GreaterThanOrEqual, fieldName, fieldValue);
+			return compare(SelectionComparison.GreaterThanOrEqual, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName is less than fieldValue
+		/// returns a EFQuery that is true if fieldName is less than rightHandSide
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery lessThan(string fieldName, object fieldValue)
+		public static EFQuery lessThan(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.LessThan, fieldName, fieldValue);
+			return compare(SelectionComparison.LessThan, fieldName, rightHandSide);
 		}
 
 		/// <summary>
-		/// returns a EFQuery that is true if fieldName is less than or equal to fieldValue
+		/// returns a EFQuery that is true if fieldName is less than or equal to rightHandSide
 		/// </summary>
 		/// <returns>EFQuery</returns>
-		public static EFQuery lessThanOrEqual(string fieldName, object fieldValue)
+		public static EFQuery lessThanOrEqual(string fieldName, object rightHandSide)
 		{
-			return compare(SelectionComparison.LessThanOrEqual, fieldName, fieldValue);
+			return compare(SelectionComparison.LessThanOrEqual, fieldName, rightHandSide);
 		}
 
 		/// <summary>
@@ -226,15 +228,36 @@ namespace JeffDege.EFQuery
 		public static EFQuery between(string fieldName, object left, object right)
 		{
 			return and(new[]
-			{
-				greaterThanOrEqual(fieldName, left),
-				lessThanOrEqual(fieldName, right)
-			});
+				{
+					greaterThanOrEqual(fieldName, left),
+					lessThanOrEqual(fieldName, right)
+				});
 		}
 
-		#endregion
+		public static EFQuery constant(object value)
+		{
+			return new EFQuery
+			{
+				selectionComparison = SelectionComparison.Constant,
+				constantValue = value
+			};
+		}
 
-		#region Member variables
+		public static EFQuery add(object left, object right)
+		{
+			return new EFQuery
+			{
+				selectionComparison = SelectionComparison.Add,
+				aggregateList = new[]
+				{
+					EFQuery.constant(left),
+					EFQuery.constant(right)
+				}
+			};
+		}
+#endregion
+
+#region Member variables
 
 		[JsonConverter(typeof(StringEnumConverter))]
 		public SelectionComparison selectionComparison { get; set; }
@@ -243,7 +266,16 @@ namespace JeffDege.EFQuery
 		public string fieldName { get; set; }
 
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-		public object fieldValue { get; set; }
+		public EFQuery rightHandSide { get; set; }
+
+		// This is here so we can deserialize old-style EFQuery strings
+		public object fieldValue
+		{
+			set { this.rightHandSide = EFQuery.constant((value)); }
+		}
+
+		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+		public object constantValue { get; set; }
 
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
 		public EFQuery innerCriteria { get; set; }
@@ -255,25 +287,229 @@ namespace JeffDege.EFQuery
 			get { return this.aggregateList_ ?? (this.aggregateList_ = new List<EFQuery>()); }
 			set { this.aggregateList_ = value; }
 		}
+		
+#endregion
 
-		#endregion
+#region Date/Time Kludges
 
-		#region Constructors
+		// These ugly convenience functions exist only because of the stupid design decisions
+		// that Novell's Netware SQL forced on us, decades ago
+
+
+		public static EFQuery dtKludgeEqual(string fieldNameBase, string fieldValue)
+		{
+			return
+				EFQuery.and(new[]
+				{
+					EFQuery.equal(fieldNameBase + "date", fieldValue + ":date"),
+					// Time value may or may not be null
+					EFQuery.or(new[]
+					{
+						EFQuery.equal(fieldNameBase + "time", fieldValue + ":time"),
+						EFQuery.equal(fieldNameBase + "time", fieldValue + ":null")
+					})
+				});
+		}
+
+		/// <summary>
+		/// returns a EFQuery that is true if the pair of date/time fields represented by
+		/// fieldNameBase equals fieldValue
+		/// </summary>
+		/// <returns>EFQuery</returns>
+		public static EFQuery dtKludgeEqual(string fieldNameBase, DateTime fieldValue)
+		{
+			if (fieldValue.Hour == 0 && fieldValue.Minute == 0 && fieldValue.Second == 0 && fieldValue.Millisecond == 0)
+				return EFQuery.equal(fieldNameBase + "date", fieldValue.Date);
+
+			var tm = fieldValue.ToString("HH:mm:ss.fff");
+
+			return
+				EFQuery.and(new[]
+				{
+					EFQuery.equal(fieldNameBase + "date", fieldValue.Date),
+					EFQuery.equal(fieldNameBase + "time", tm)
+				});
+		}
+
+		public static EFQuery dtKludgeGreaterThanOrEqual(string fieldNameBase, string fieldValue)
+		{
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.greaterThanOrEqual(fieldNameBase + "date", fieldValue + ":date"),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue + ":date"),
+						// Time value may or may not be null
+						EFQuery.or(new []{
+							EFQuery.greaterThanOrEqual(fieldNameBase + "time", fieldValue + ":time"),
+							EFQuery.equal(fieldNameBase + "time", fieldValue + ":null")
+						})
+					})
+				});
+		}
+	
+		/// <summary>
+		/// returns a EFQuery that is true if the pair of date/time fields represented by
+		/// fieldNameBase is greater than or equal to fieldValue
+		/// </summary>
+		/// <returns>EFQuery</returns>
+		public static EFQuery dtKludgeGreaterThanOrEqual(string fieldNameBase, DateTime fieldValue)
+		{
+			if (fieldValue.Hour == 0 && fieldValue.Minute == 0 && fieldValue.Second == 0 && fieldValue.Millisecond == 0)
+				return EFQuery.greaterThanOrEqual(fieldNameBase + "date", fieldValue.Date);
+
+			var tm = fieldValue.ToString("HH:mm:ss.fff");
+
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.greaterThanOrEqual(fieldNameBase + "date", fieldValue.Date),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue.Date),
+						EFQuery.greaterThanOrEqual(fieldNameBase + "time", tm)
+					})
+				});
+		}
+
+		public static EFQuery dtKludgeGreaterThan(string fieldNameBase, string fieldValue)
+		{
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.greaterThan(fieldNameBase + "date", fieldValue + ":date"),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue + ":date"),
+						// Time value may or may not be null
+						EFQuery.or(new []{
+							EFQuery.greaterThan(fieldNameBase + "time", fieldValue + ":time"),
+							EFQuery.equal(fieldNameBase + "time", fieldValue + ":null")
+						})
+					})
+				});
+		}
+
+		/// <summary>
+		/// returns a EFQuery that is true if the pair of date/time fields represented by
+		/// fieldNameBase is greater than fieldValue
+		/// </summary>
+		/// <returns>EFQuery</returns>
+		public static EFQuery dtKludgeGreaterThan(string fieldNameBase, DateTime fieldValue)
+		{
+			if (fieldValue.Hour == 0 && fieldValue.Minute == 0 && fieldValue.Second == 0 && fieldValue.Millisecond == 0)
+				return EFQuery.greaterThan(fieldNameBase + "date", fieldValue.Date);
+
+			var tm = fieldValue.ToString("HH:mm:ss.fff");
+
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.greaterThan(fieldNameBase + "date", fieldValue.Date),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue.Date),
+						EFQuery.greaterThan(fieldNameBase + "time", tm)
+					})
+				});
+		}
+
+		public static EFQuery dtKludgeLessThanOrEqual(string fieldNameBase, string fieldValue)
+		{
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.lessThanOrEqual(fieldNameBase + "date", fieldValue + ":date"),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue + ":date"),
+						// Time value may or may not be null
+						EFQuery.or(new []{
+							EFQuery.lessThanOrEqual(fieldNameBase + "time", fieldValue + ":time"),
+							EFQuery.equal(fieldNameBase + "time", fieldValue + ":null")
+						})
+					})
+				});
+		}
+
+		/// <summary>
+		/// returns a EFQuery that is true if the pair of date/time fields represented by
+		/// fieldNameBase is less than or equal to fieldValue
+		/// </summary>
+		/// <returns>EFQuery</returns>
+		public static EFQuery dtKludgeLessThanOrEqual(string fieldNameBase, DateTime fieldValue)
+		{
+			if (fieldValue.Hour == 0 && fieldValue.Minute == 0 && fieldValue.Second == 0 && fieldValue.Millisecond == 0)
+				return EFQuery.lessThanOrEqual(fieldNameBase + "date", fieldValue.Date);
+
+			var tm = fieldValue.ToString("HH:mm:ss.fff");
+
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.lessThanOrEqual(fieldNameBase + "date", fieldValue.Date),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue.Date),
+						EFQuery.lessThanOrEqual(fieldNameBase + "time", tm)
+					})
+				});
+		}
+
+		public static EFQuery dtKludgeLessThan(string fieldNameBase, string fieldValue)
+		{
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.lessThan(fieldNameBase + "date", fieldValue + ":date"),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue + ":date"),
+						// Time value may or may not be null
+						EFQuery.or(new []{
+							EFQuery.lessThan(fieldNameBase + "time", fieldValue + ":time"),
+							EFQuery.equal(fieldNameBase + "time", fieldValue + ":null")
+						})
+					})
+				});
+		}
+
+		/// <summary>
+		/// returns a EFQuery that is true if the pair of date/time fields represented by
+		/// fieldNameBase is less than fieldValue
+		/// </summary>
+		/// <returns>EFQuery</returns>
+		public static EFQuery dtKludgeLessThan(string fieldNameBase, DateTime fieldValue)
+		{
+			if (fieldValue.Hour == 0 && fieldValue.Minute == 0 && fieldValue.Second == 0 && fieldValue.Millisecond == 0)
+				return EFQuery.lessThan(fieldNameBase + "date", fieldValue.Date);
+
+			var tm = fieldValue.ToString("HH:mm:ss.fff");
+
+			return
+				EFQuery.or(new[]
+				{
+					EFQuery.lessThan(fieldNameBase + "date", fieldValue.Date),
+					EFQuery.and(new[]
+					{
+						EFQuery.equal(fieldNameBase + "date", fieldValue.Date),
+						EFQuery.lessThan(fieldNameBase + "time", tm)
+					})
+				});
+		}
+
+#endregion
+
+#region Constructors
 
 		public EFQuery()
 		{
-			// We default to Equal because that's our most common pattern:
-			this.selectionComparison = SelectionComparison.Equal;
+			this.selectionComparison = SelectionComparison.Constant;
+			this.constantValue = null;
 		}
 
-		public EFQuery(SelectionComparison selectionComparison, string fieldName, object fieldValue)
-		{
-			this.selectionComparison = selectionComparison;
-			this.fieldName = fieldName;
-			this.fieldValue = fieldValue;
-		}
-
-		#endregion
+#endregion
 
 		// This just tells JSON.net whether to include aggregateList when serializing an object
 		public bool ShouldSerializeaggregateList()
@@ -281,7 +517,20 @@ namespace JeffDege.EFQuery
 			return this.aggregateList_ != null;
 		}
 
-		#region processing types
+#region processing types
+
+		[JsonIgnore]
+		public bool isAdd
+		{
+			get { return this.selectionComparison == SelectionComparison.Add; }
+		}
+
+		[JsonIgnore]
+		public bool isConstant
+		{
+			get { return this.selectionComparison == SelectionComparison.Constant; }
+		}
+
 		[JsonIgnore]
 		public bool isMethodCall
 		{
@@ -289,12 +538,12 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.Contains:
-				case SelectionComparison.StartsWith:
-				case SelectionComparison.EndsWith:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.Contains:
+					case SelectionComparison.StartsWith:
+					case SelectionComparison.EndsWith:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
@@ -306,10 +555,10 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.Like:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.Like:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
@@ -321,10 +570,10 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.Any:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.Any:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
@@ -336,13 +585,13 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.And:
-				case SelectionComparison.Or:
-				case SelectionComparison.Nand:
-				case SelectionComparison.Nor:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.And:
+					case SelectionComparison.Or:
+					case SelectionComparison.Nand:
+					case SelectionComparison.Nor:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
@@ -354,11 +603,11 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.Nand:
-				case SelectionComparison.Nor:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.Nand:
+					case SelectionComparison.Nor:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
@@ -370,11 +619,11 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.And:
-				case SelectionComparison.Nand:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.And:
+					case SelectionComparison.Nand:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
@@ -386,18 +635,18 @@ namespace JeffDege.EFQuery
 			{
 				switch (this.selectionComparison)
 				{
-				case SelectionComparison.IsTrue:
-				case SelectionComparison.IsFalse:
-					return true;
-				default:
-					return false;
+					case SelectionComparison.IsTrue:
+					case SelectionComparison.IsFalse:
+						return true;
+					default:
+						return false;
 				}
 			}
 		}
-		#endregion
+#endregion
 
-		#region predicate constructors
-		public Expression<Func<T, bool>> constructPredicate<T>()
+#region predicate construction functions
+		public Expression<Func<T, bool>> constructPredicate<T>(object context = null)
 		{
 			if (this.isUnary)
 				return this.selectionComparison == SelectionComparison.IsTrue
@@ -405,27 +654,29 @@ namespace JeffDege.EFQuery
 					: PredicateBuilder.False<T>();
 
 			if (this.isAggregate)
-				return this.constructAggregatePredicate<T>();
+				return this.constructAggregatePredicate<T>(context);
 
 			if (this.isMethodCall)
-				return this.constructMethodCallPredicate<T>();
+				return this.constructMethodCallPredicate<T>(context);
 
 			if (this.isStaticCall)
-				return this.constructStaticCallPredicate<T>();
+				return this.constructStaticCallPredicate<T>(context);
 
 			if (this.isAny)
-				return this.constructAnyPredicate<T>();
+				return this.constructAnyPredicate<T>(context);
 
-			return this.constructSinglePredicate<T>();
+			return this.constructSinglePredicate<T>(context);
 		}
 
-		private Expression<Func<T, bool>> constructAggregatePredicate<T>()
+		private Expression<Func<T, bool>> constructAggregatePredicate<T>(object context)
 		{
 			var predicate = this.isAnd ? PredicateBuilder.True<T>() : PredicateBuilder.False<T>();
 
 			foreach (var item in this.aggregateList)
 			{
-				predicate = this.isAnd ? predicate.And(item.constructPredicate<T>()) : predicate.Or(item.constructPredicate<T>());
+				predicate = this.isAnd 
+					? predicate.And(item.constructPredicate<T>(context))
+					: predicate.Or(item.constructPredicate<T>(context));
 			}
 
 			if (this.isNegate)
@@ -434,7 +685,7 @@ namespace JeffDege.EFQuery
 			return predicate;
 		}
 
-		public static Expression<Func<T, bool>> negate<T>(Expression<Func<T, bool>> one)
+		private static Expression<Func<T, bool>> negate<T>(Expression<Func<T, bool>> one)
 		{
 			if (one.Parameters.Count != 1)
 				throw new InvalidOperationException("Cannot \"not\" a compound expression");
@@ -444,7 +695,7 @@ namespace JeffDege.EFQuery
 			return Expression.Lambda<Func<T, bool>>(body, candidateExpr);
 		}
 
-		private Expression<Func<T, bool>> constructMethodCallPredicate<T>()
+		private Expression<Func<T, bool>> constructMethodCallPredicate<T>(object context)
 		{
 			var type = typeof(T);
 
@@ -457,9 +708,7 @@ namespace JeffDege.EFQuery
 
 			var parameter = Expression.Parameter(type);
 			var member = Expression.PropertyOrField(parameter, this.fieldName);
-			var value = (this.fieldValue == null)
-				? Expression.Constant(null)
-				: Expression.Constant(this.fieldValue, this.fieldValue.GetType());
+			var value = this.constructConstantExpression<T>(this.rightHandSide, context);
 
 			try
 			{
@@ -476,12 +725,12 @@ namespace JeffDege.EFQuery
 			catch (Exception)
 			{
 				throw new InvalidOperationException(
-					String.Format("Cannot convert value \"{0}\" of type \"{1}\" to field \"{2}\" of type \"{3}\"", this.fieldValue,
+					String.Format("Cannot convert value \"{0}\" of type \"{1}\" to field \"{2}\" of type \"{3}\"", this.rightHandSide,
 						value.Type, this.fieldName, member.Type));
 			}
 		}
 
-		private Expression<Func<T, bool>> constructStaticCallPredicate<T>()
+		private Expression<Func<T, bool>> constructStaticCallPredicate<T>(object context)
 		{
 			var type = typeof(T);
 
@@ -490,9 +739,7 @@ namespace JeffDege.EFQuery
 
 			var parameter = Expression.Parameter(type);
 			var member = Expression.PropertyOrField(parameter, this.fieldName);
-			var value = (this.fieldValue == null)
-				? Expression.Constant(null)
-				: Expression.Constant(this.fieldValue, this.fieldValue.GetType());
+			var value = this.constructConstantExpression<T>(this.rightHandSide, context);
 
 			try
 			{
@@ -509,7 +756,7 @@ namespace JeffDege.EFQuery
 			catch (Exception)
 			{
 				throw new InvalidOperationException(
-					String.Format("Cannot convert value \"{0}\" of type \"{1}\" to field \"{2}\" of type \"{3}\"", this.fieldValue,
+					String.Format("Cannot convert value \"{0}\" of type \"{1}\" to field \"{2}\" of type \"{3}\"", this.rightHandSide,
 						value.Type, this.fieldName, member.Type));
 			}
 		}
@@ -533,7 +780,7 @@ namespace JeffDege.EFQuery
 			throw new InvalidExpressionException(String.Format("Invalid SelectionComparison {0}", selectionComparison));
 		}
 
-		private Expression<Func<T, bool>> constructAnyPredicate<T>()
+		public Expression<Func<T, bool>> constructAnyPredicate<T>(object context)
 		{
 			var type = typeof(T);
 
@@ -549,7 +796,7 @@ namespace JeffDege.EFQuery
 
 			var constructPredicateMethod = typeof(EFQuery).GetMethod("constructPredicate");
 			var constructPredicateMethodGeneric = constructPredicateMethod.MakeGenericMethod(memberType);
-			var innerPredicate = (Expression)constructPredicateMethodGeneric.Invoke(this.innerCriteria, null);
+			var innerPredicate = (Expression)constructPredicateMethodGeneric.Invoke(this.innerCriteria, new object[] { context });
 
 			var call = Expression.Call(typeof(Enumerable), "Any",
 				new Type[] { memberType }, new[] { member, innerPredicate });
@@ -559,7 +806,7 @@ namespace JeffDege.EFQuery
 			return lambda;
 		}
 
-		private Expression<Func<T, bool>> constructSinglePredicate<T>()
+		public Expression<Func<T, bool>> constructSinglePredicate<T>(object context)
 		{
 			var type = typeof(T);
 
@@ -567,9 +814,7 @@ namespace JeffDege.EFQuery
 
 			var member = this.getMember<T>(type, parameter);
 
-			var value = (this.fieldValue == null)
-				? Expression.Constant(null)
-				: Expression.Constant(this.fieldValue, this.fieldValue.GetType());
+			var value = this.constructConstantExpression<T>(this.rightHandSide, context);
 
 			ExpressionType operation;
 			if (!operationMap.TryGetValue(this.selectionComparison, out operation))
@@ -609,9 +854,149 @@ namespace JeffDege.EFQuery
 			catch (Exception)
 			{
 				throw new InvalidOperationException(
-					String.Format("Cannot convert value \"{0}\" of type \"{1}\" to field \"{2}\" of type \"{3}\"", this.fieldValue,
+					String.Format("Cannot convert value \"{0}\" of type \"{1}\" to field \"{2}\" of type \"{3}\"", this.rightHandSide,
 						value.Type, this.fieldName, member.Type));
 			}
+		}
+
+		private ConstantExpression constructConstantExpression<T>(object value, object context)
+		{
+			var sc = value as EFQuery;
+			if (sc != null)
+			{
+				if (sc.isAdd)
+					value = this.executeAddExpression<T>(sc, context);
+				else if (sc.isConstant)
+					value = sc.constantValue;
+			}
+
+			value = getConstantValue(value, context);
+
+			if (value == null)
+				return Expression.Constant(null);
+
+			return Expression.Constant(value, value.GetType());
+		}
+
+		private object executeAddExpression<T>(EFQuery sc, object context)
+		{
+			object result = null;
+
+			foreach (var arg in sc.aggregateList)
+			{
+				if (!arg.isConstant)
+					throw new ArgumentException(String.Format("{0} must be constant", sc));
+
+				if (result == null)
+				{
+					result = getConstantValue(arg.constantValue, context);
+					continue;
+				}
+
+				var value = getConstantValue(arg.constantValue, context);
+
+				// Until we figure out how to make Json.NET deserialize into TimeSpan objects ...
+				var s = value as string;
+				if (s != null)
+				{
+					TimeSpan span;
+					if (TimeSpan.TryParse(s, out span))
+						value = span;
+				}
+
+				var leftType = result.GetType();
+				var rightType = value.GetType();
+
+				var methodInfo = leftType.GetMethod("Add", new[] {rightType});
+
+				if (methodInfo == null)
+					throw new ArgumentException(
+						String.Format("Cannot find operation \"Add\" for type \"{0}\"", leftType));
+
+				result = methodInfo.Invoke(result, new[] { value });
+			}
+
+			return result;
+		}
+
+		private static object getConstantValue(object value, object context)
+		{
+			string dtKludge = null;
+			var s = value as String;
+			if (s != null)
+			{
+				var re = new Regex("^{(.*)}(:.*)?$");
+				var match = re.Match(s);
+				if (match.Success)
+				{
+					var matchString = match.Groups[1].Value;
+					dtKludge = match.Groups[2].Value;
+					if (!String.IsNullOrEmpty(matchString))
+					{
+						if (matchString == "NOW")
+						{
+							value = DateTime.Now;
+						}
+						else if (matchString == "NOW:DATE")
+						{
+							value = DateTime.Now.Date;
+						}
+						else if (matchString == "NOW:TIME")
+						{
+							value = DateTime.Now.TimeOfDay;
+						}
+						else
+						{
+							var parts = matchString.Split(new[] {'.'});
+							foreach (var part in parts)
+							{
+								var dict = context as Dictionary<string, object>;
+								if (dict != null)
+								{
+									var val = dict[part];
+									context = val;
+									value = val;
+								}
+								else
+								{
+									var type = context.GetType();
+									var prop = type.GetProperty(part);
+									if (prop != null)
+									{
+										var val = prop.GetValue(context, null);
+										context = val;
+										value = val;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (value is DateTime)
+			{
+				var dt = (DateTime) value;
+
+				if (dtKludge == ":date")
+				{
+					value = dt.Date;
+				}
+				else if (dtKludge == ":time")
+				{
+					value = dt.ToString("HH:mm:ss.fff");
+				}
+				else if (dtKludge == ":null")
+				{
+					var f = dt.ToString("HH:mm:ss.fff");
+					if (f == "00:00:00.000")
+						value = null;
+					else
+						value = f;
+				}
+			}
+
+			return value;
 		}
 
 		private MemberExpression getMember<T>(Type type, ParameterExpression parameter)
@@ -642,11 +1027,11 @@ namespace JeffDege.EFQuery
 			}
 
 			return rVal;
-		}
-		#endregion
+		} 
+#endregion
 
 
-		#region internal dictionaries
+#region internal dictionaries
 
 		private static readonly Dictionary<SelectionComparison, ExpressionType> operationMap =
 			new Dictionary<SelectionComparison, ExpressionType>
@@ -669,7 +1054,8 @@ namespace JeffDege.EFQuery
 				{ SelectionComparison.StartsWith, typeof(string).GetMethod("StartsWith", new[] { typeof(string) }) },
 				{ SelectionComparison.EndsWith, typeof(string).GetMethod("EndsWith", new[] { typeof(string) }) },
 			};
-		#endregion
+#endregion
+
 	}
 
 	public enum SelectionComparison
@@ -690,7 +1076,10 @@ namespace JeffDege.EFQuery
 		StartsWith,
 		EndsWith,
 		Like,
-		Any
+		Any,
+		Constant,
+		Add
 	};
 
 }
+
