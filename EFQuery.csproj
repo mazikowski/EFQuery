@@ -54,18 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EFQuery.cs" />
+    <Compile Include="PredicateBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PredicateBuilder\PredicateBuilder.csproj">
-      <Project>{293cbee5-b2bb-4e30-9806-ccf3f3e9b977}</Project>
-      <Name>PredicateBuilder</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
