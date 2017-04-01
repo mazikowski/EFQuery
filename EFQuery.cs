@@ -154,6 +154,10 @@ namespace JeffDege.EFQuery
 		/// returns a EFQuery that is true if all of the efQueries evaluate true
 		/// </summary>
 		/// <returns>EFQuery</returns>
+		public static EFQuery and(params EFQuery[] efQueries)
+		{
+			return and(efQueries as IEnumerable<EFQuery>);
+		}
 		public static EFQuery and(IEnumerable<EFQuery> efQueries)
 		{
 			return new EFQuery
@@ -167,6 +171,10 @@ namespace JeffDege.EFQuery
 		/// returns a EFQuery that is true if at least one of the efQueries evaluates true
 		/// </summary>
 		/// <returns>EFQuery</returns>
+		public static EFQuery or(params EFQuery[] efQueries)
+		{
+			return or(efQueries as IEnumerable<EFQuery>);
+		}
 		public static EFQuery or(IEnumerable<EFQuery> efQueries)
 		{
 			return new EFQuery
@@ -180,6 +188,10 @@ namespace JeffDege.EFQuery
 		/// returns a EFQuery that is true if at least one the efQueries evaluates false
 		/// </summary>
 		/// <returns>EFQuery</returns>
+		public static EFQuery nand(params EFQuery[] efQueries)
+		{
+			return nand(efQueries as IEnumerable<EFQuery>);
+		}
 		public static EFQuery nand(IEnumerable<EFQuery> efQueries)
 		{
 			return new EFQuery
@@ -193,6 +205,10 @@ namespace JeffDege.EFQuery
 		/// returns a EFQuery that is true if all of the efQueries evaluate false
 		/// </summary>
 		/// <returns>EFQuery</returns>
+		public static EFQuery nor(params EFQuery[] efQueries)
+		{
+			return nor(efQueries as IEnumerable<EFQuery>);
+		}
 		public static EFQuery nor(IEnumerable<EFQuery> efQueries)
 		{
 			return new EFQuery
