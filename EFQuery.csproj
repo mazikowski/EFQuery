@@ -7,8 +7,8 @@
     <ProjectGuid>{C5201BD7-3606-4201-8369-F8DD12864DDB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SelectionCriteria</RootNamespace>
-    <AssemblyName>SelectionCriteria</AssemblyName>
+    <RootNamespace>JeffDege.EFQuery</RootNamespace>
+    <AssemblyName>JeffDege.EFQuery</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -61,6 +61,9 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="JavaScript\EFQuery.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
